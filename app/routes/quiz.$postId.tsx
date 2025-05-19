@@ -161,10 +161,9 @@ function QuizPartyHomePage() {
       <div className="max-w-7xl mx-auto">
 
         <QuizHeader 
-          tournamentName={tournament.name}
           currentRound={tournament.currentRound}
           totalRounds={tournament.totalRounds}
-          timeRemaining="03:45"
+          timeRemaining={225}
         />
         
         {/* Quiz Card as hero */}
