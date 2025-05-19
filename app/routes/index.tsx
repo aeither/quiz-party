@@ -1,184 +1,72 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { AnimatePresence, motion } from 'framer-motion';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { toast } from "sonner";
-import { useAccount } from 'wagmi';
-import AIHostAvatar from '../components/AIHostAvatar';
-import ChatBox from '../components/ChatBox';
-import LeaderboardCard from '../components/LeaderboardCard';
-import QuestionCard from '../components/QuestionCard';
-import QuizHeader from '../components/QuizHeader';
-import { mockQuestions, mockTournament } from '../data/mockData';
-import { Message, Player, Question } from '../types/quiz';
+import { fetchPostAndComments } from '../lib/lensApi';
+
+const POST_IDS = [
+  '3nscjarhr9ewvjdwk7y',
+  '3hcfsqhf0x3x7sg7m0s',
+  '1dy7kvpqjmd2rzkp9fz',
+];
 
 export const Route = createFileRoute('/')({
-  component: QuizPartyHomePage,
+  component: LandingPage,
 });
 
-function QuizPartyHomePage() {
-  const { isConnected, address } = useAccount();
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [questions, setQuestions] = useState<Question[]>(mockQuestions);
-  const [players, setPlayers] = useState<Player[]>(mockTournament.players);
-  const [messages, setMessages] = useState<Message[]>(mockTournament.messages);
-  const [tournament, setTournament] = useState(mockTournament);
-  const [aiThinking, setAiThinking] = useState(false);
-  const [aiMessage, setAiMessage] = useState("Welcome to the Knowledge Tournament!");
-  const [username, setUsername] = useState("Guest" + Math.floor(Math.random() * 1000));
+function LandingPage() {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate a timer for question advancement
-    const timer = setTimeout(() => {
-      if (currentQuestionIndex < questions.length - 1) {
-        setAiThinking(true);
-        setAiMessage("Preparing the next question...");
-        setTimeout(() => {
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
-          setAiThinking(false);
-          setAiMessage(`Question ${currentQuestionIndex + 2} is ready!`);
-          // Add AI message about new question
-          const newMessage: Message = {
-            id: `ai-q-${Date.now()}`,
-            user: 'QuizBot',
-            content: questions[currentQuestionIndex + 1].text,
-            timestamp: new Date(),
-            isAIHost: true
-          };
-          setMessages(prev => [...prev, newMessage]);
-        }, 3000);
-      }
-    }, 45000);
-    return () => clearTimeout(timer);
-  }, [currentQuestionIndex, questions]);
-
-  const handleAnswerSubmit = (answer: string, isCorrect: boolean) => {
-    // Add the user's answer to the chat
-    const newMessage: Message = {
-      id: `user-${Date.now()}`,
-      user: username,
-      content: answer,
-      timestamp: new Date(),
-      isCorrect
-    };
-    setMessages(prev => [...prev, newMessage]);
-    // Update player score if correct
-    if (isCorrect) {
-      const pointsEarned = questions[currentQuestionIndex].difficulty === 'easy' ? 50 : 
-                          questions[currentQuestionIndex].difficulty === 'medium' ? 100 : 150;
-      // Check if player already exists
-      const existingPlayerIndex = players.findIndex(p => p.name === username);
-      if (existingPlayerIndex >= 0) {
-        const updatedPlayers = [...players];
-        updatedPlayers[existingPlayerIndex].score += pointsEarned;
-        setPlayers(updatedPlayers);
-      } else {
-        // Add new player
-        const newPlayer: Player = {
-          id: `player-${Date.now()}`,
-          name: username,
-          score: pointsEarned,
-          avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${username}`
-        };
-        setPlayers(prev => [...prev, newPlayer]);
-      }
-      // Show toast for points earned
-      toast(`Correct Answer!, You earned ${pointsEarned} points`);
-      // Add AI response
-      setTimeout(() => {
-        const aiResponse: Message = {
-          id: `ai-${Date.now()}`,
-          user: 'QuizBot',
-          content: `That's correct, ${username}! You earned ${pointsEarned} points.`,
-          timestamp: new Date(),
-          isAIHost: true
-        };
-        setMessages(prev => [...prev, aiResponse]);
-      }, 1000);
-    } else {
-      // Add AI response for incorrect answer
-      setTimeout(() => {
-        const aiResponse: Message = {
-          id: `ai-${Date.now()}`,
-          user: 'QuizBot',
-          content: `Sorry ${username}, that's not quite right. The correct answer is ${questions[currentQuestionIndex].correctAnswer}.`,
-          timestamp: new Date(),
-          isAIHost: true
-        };
-        setMessages(prev => [...prev, aiResponse]);
-      }, 1000);
-    }
-  };
-
-  const handleSendMessage = (message: string) => {
-    // Add user chat message
-    const newMessage: Message = {
-      id: `chat-${Date.now()}`,
-      user: username,
-      content: message,
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, newMessage]);
-    // Check if the message is a correct answer to the current question
-    const currentQuestion = questions[currentQuestionIndex];
-    const isCorrect = currentQuestion.correctAnswer.toLowerCase() === message.toLowerCase();
-    if (isCorrect) {
-      handleAnswerSubmit(message, true);
-    }
-  };
-
-  const currentQuestion = questions[currentQuestionIndex];
+    setLoading(true);
+    Promise.all(POST_IDS.map(id => fetchPostAndComments(id).then(res => ({ ...res.post, id }))))
+      .then(setPosts)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
-    <div className="min-h-screen quiz-gradient py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        <QuizHeader 
-          tournamentName={tournament.name}
-          currentRound={tournament.currentRound}
-          totalRounds={tournament.totalRounds}
-          timeRemaining="03:45"
-        />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <motion.div
-              className="flex justify-center mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <AIHostAvatar message={aiMessage} isThinking={aiThinking} />
-            </motion.div>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentQuestionIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
-                <QuestionCard
-                  question={currentQuestion.text}
-                  options={currentQuestion.options}
-                  correctAnswer={currentQuestion.correctAnswer}
-                  onAnswer={handleAnswerSubmit}
-                  timeLimit={currentQuestion.timeLimit}
-                />
-              </motion.div>
-            </AnimatePresence>
-            <div className="mt-6">
-              <LeaderboardCard players={players} />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-200 via-purple-200 to-orange-100">
+      <div className="bg-white rounded-2xl shadow-xl p-10 flex flex-col items-center">
+        <h1 className="text-4xl font-extrabold text-purple-700 mb-4">Welcome to Quiz Party!</h1>
+        <p className="text-lg text-gray-700 mb-6">Test your knowledge and join the fun. Choose a quiz to get started:</p>
+        {loading ? (
+          <div className="text-lg text-purple-500 font-bold animate-pulse">Loading quizzes...</div>
+        ) : (
+          <div className="w-full max-w-3xl overflow-x-auto">
+            <div className="flex gap-6 py-2 px-1" style={{ minWidth: 700 }}>
+              {posts.concat(posts).map((post, idx) => (
+                <motion.div
+                  key={post.id + '-' + idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ scale: 1.05, rotate: -2 + Math.random() * 4 }}
+                  transition={{ duration: 0.4, delay: idx * 0.1 }}
+                  className="min-w-[320px] max-w-xs bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl shadow-lg p-5 flex flex-col items-center border-2 border-purple-200 relative"
+                >
+                  {post.image && (
+                    <img src={post.image} alt="quiz" className="w-32 h-32 rounded-xl object-cover mb-3 border-4 border-pink-200 shadow" />
+                  )}
+                  <div className="flex items-center gap-2 mb-2">
+                    <img src={post.authorAvatar || '/default-avatar.png'} className="w-8 h-8 rounded-full" />
+                    <span className="font-bold text-purple-700">{post.author}</span>
+                    <span className="text-xs text-gray-500">@{post.authorHandle}</span>
+                  </div>
+                  <div className="text-lg font-semibold text-purple-900 mb-1 line-clamp-2 text-center">{post.content || 'Quiz'}</div>
+                  <div className="flex gap-3 text-sm text-gray-500 mb-3">
+                    <span>💖 {post.stats?.reactions || 0}</span>
+                    <span>💬 {post.stats?.comments || 0}</span>
+                    <span>🔄 {post.stats?.reposts || 0}</span>
+                  </div>
+                  <Link to="/quiz/$postId" params={{ postId: post.id }} className="w-full">
+                    <button className="w-full px-4 py-2 rounded-full font-bold bg-gradient-to-r from-pink-400 to-purple-400 text-white shadow hover:scale-105 active:scale-95 transition-all duration-200 mt-auto">
+                      Start Quiz
+                    </button>
+                  </Link>
+                </motion.div>
+              ))}
             </div>
           </div>
-          <div className="lg:col-span-1 h-[600px]">
-            <ChatBox 
-              messages={messages}
-              onSendMessage={handleSendMessage}
-              currentQuestion={currentQuestion.text}
-            />
-          </div>
-        </div>
-        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>Connect your wallet to receive on-chain rewards for your participation!</p>
-        </div>
+        )}
       </div>
     </div>
   );

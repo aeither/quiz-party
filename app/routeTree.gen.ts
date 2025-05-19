@@ -15,6 +15,7 @@ import { Route as TransactionsImport } from './routes/transactions'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as PostsImport } from './routes/posts'
 import { Route as IndexImport } from './routes/index'
+import { Route as QuizPostIdImport } from './routes/quiz.$postId'
 
 // Create/Update Routes
 
@@ -39,6 +40,12 @@ const PostsRoute = PostsImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const QuizPostIdRoute = QuizPostIdImport.update({
+  id: '/quiz/$postId',
+  path: '/quiz/$postId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -74,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsImport
       parentRoute: typeof rootRoute
     }
+    '/quiz/$postId': {
+      id: '/quiz/$postId'
+      path: '/quiz/$postId'
+      fullPath: '/quiz/$postId'
+      preLoaderRoute: typeof QuizPostIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -84,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/posts': typeof PostsRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
+  '/quiz/$postId': typeof QuizPostIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -91,6 +106,7 @@ export interface FileRoutesByTo {
   '/posts': typeof PostsRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
+  '/quiz/$postId': typeof QuizPostIdRoute
 }
 
 export interface FileRoutesById {
@@ -99,14 +115,21 @@ export interface FileRoutesById {
   '/posts': typeof PostsRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
+  '/quiz/$postId': typeof QuizPostIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/posts' | '/settings' | '/transactions'
+  fullPaths: '/' | '/posts' | '/settings' | '/transactions' | '/quiz/$postId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/posts' | '/settings' | '/transactions'
-  id: '__root__' | '/' | '/posts' | '/settings' | '/transactions'
+  to: '/' | '/posts' | '/settings' | '/transactions' | '/quiz/$postId'
+  id:
+    | '__root__'
+    | '/'
+    | '/posts'
+    | '/settings'
+    | '/transactions'
+    | '/quiz/$postId'
   fileRoutesById: FileRoutesById
 }
 
@@ -115,6 +138,7 @@ export interface RootRouteChildren {
   PostsRoute: typeof PostsRoute
   SettingsRoute: typeof SettingsRoute
   TransactionsRoute: typeof TransactionsRoute
+  QuizPostIdRoute: typeof QuizPostIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -122,6 +146,7 @@ const rootRouteChildren: RootRouteChildren = {
   PostsRoute: PostsRoute,
   SettingsRoute: SettingsRoute,
   TransactionsRoute: TransactionsRoute,
+  QuizPostIdRoute: QuizPostIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -137,7 +162,8 @@ export const routeTree = rootRoute
         "/",
         "/posts",
         "/settings",
-        "/transactions"
+        "/transactions",
+        "/quiz/$postId"
       ]
     },
     "/": {
@@ -151,6 +177,9 @@ export const routeTree = rootRoute
     },
     "/transactions": {
       "filePath": "transactions.tsx"
+    },
+    "/quiz/$postId": {
+      "filePath": "quiz.$postId.tsx"
     }
   }
 }
