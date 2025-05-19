@@ -72,7 +72,7 @@ export function Header() {
               <PenSquare className="w-5 h-5" />
             </button> */}
             <Link to="/" className="text-xl font-bold">
-              QuizParty
+              EverQuiz
             </Link>
           </div>
 

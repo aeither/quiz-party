@@ -10,10 +10,10 @@ const config = createConfig(
       [lens.id]: http("https://rpc.lens.xyz"),
     },
     walletConnectProjectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
-    appName: "QuizParty",
-    appDescription: "QuizParty: The social quiz and party game platform.",
-    appUrl: "https://your-quizparty-url.com",
-    appIcon: "https://your-quizparty-url.com/icon.png",
+    appName: "EverQuiz",
+    appDescription: "EverQuiz: The social quiz and party game platform.",
+    appUrl: "https://your-everquiz-url.com",
+    appIcon: "https://your-everquiz-url.com/icon.png",
   })
 );
 

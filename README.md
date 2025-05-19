@@ -1,8 +1,8 @@
-# QuizParty
+# EverQuiz
 
-**One-liner:** QuizParty is your social quiz and party game platform.
+**One-liner:** EverQuiz is your social quiz and party game platform.
 
-**Brief description:** QuizParty lets you create, join, and play quizzes and party games with friends, powered by web3. (Update the rest of the description as needed to match your new project vision.)
+**Brief description:** EverQuiz lets you create, join, and play quizzes and party games with friends, powered by web3. (Update the rest of the description as needed to match your new project vision.)
 
 ## Overview
 

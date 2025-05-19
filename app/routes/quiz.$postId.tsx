@@ -2,7 +2,6 @@ import { createFileRoute, useParams } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { toast } from "sonner";
-import AIHostAvatar from '../components/AIHostAvatar';
 import ChatBox from '../components/ChatBox';
 import LeaderboardCard from '../components/LeaderboardCard';
 import QuestionCard from '../components/QuestionCard';
@@ -160,29 +159,6 @@ function QuizPartyHomePage() {
   return (
     <div className="min-h-screen quiz-gradient py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Compact Post Card with real data */}
-        {loadingReal ? (
-          <div className="mb-6">Loading post...</div>
-        ) : realPost && (
-          <div className="flex items-center gap-4 mb-6 bg-white rounded-xl shadow p-4">
-            {realPost.image && (
-              <img src={realPost.image} alt="post" className="w-20 h-20 rounded-lg object-cover" />
-            )}
-            <div>
-              <div className="flex items-center gap-2">
-                <img src={realPost.authorAvatar || '/default-avatar.png'} className="w-10 h-10 rounded-full" />
-                <span className="font-bold">{realPost.author}</span>
-                <span className="text-xs text-gray-500">@{realPost.authorHandle}</span>
-              </div>
-              <div className="mt-1">{realPost.content}</div>
-              <div className="flex gap-4 text-sm text-gray-500 mt-2">
-                <span>💖 {realPost.stats?.reactions || 0}</span>
-                <span>💬 {realPost.stats?.comments || 0}</span>
-                <span>🔄 {realPost.stats?.reposts || 0}</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         <QuizHeader 
           tournamentName={tournament.name}
@@ -190,16 +166,41 @@ function QuizPartyHomePage() {
           totalRounds={tournament.totalRounds}
           timeRemaining="03:45"
         />
+        
+        {/* Quiz Card as hero */}
+        <div className="flex justify-center mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-2xl bg-gradient-to-br from-purple-400 via-pink-300 to-orange-200 rounded-3xl shadow-2xl border-4 border-purple-300 p-6 flex flex-col items-center"
+          >
+            {loadingReal ? (
+              <div className="text-lg text-white font-bold animate-pulse">Loading quiz...</div>
+            ) : realPost && (
+              <>
+                {realPost.image && (
+                  <img src={realPost.image} alt="quiz" className="w-32 h-32 rounded-xl object-cover mb-3 border-4 border-white shadow" />
+                )}
+                <div className="flex items-center gap-2 mb-2">
+                  <img src={realPost.authorAvatar || '/default-avatar.png'} className="w-8 h-8 rounded-full border-2 border-white" />
+                  <span className="font-bold text-white drop-shadow">{realPost.author}</span>
+                  <span className="text-xs text-white/80">@{realPost.authorHandle}</span>
+                </div>
+                <div className="text-xl font-semibold text-white mb-1 text-center drop-shadow line-clamp-2">{realPost.content || 'Quiz'}</div>
+                <div className="flex gap-4 text-base text-white/90 mb-2">
+                  <span>💖 {realPost.stats?.reactions || 0}</span>
+                  <span>💬 {realPost.stats?.comments || 0}</span>
+                  <span>🔄 {realPost.stats?.reposts || 0}</span>
+                </div>
+              </>
+            )}
+          </motion.div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <motion.div
-              className="flex justify-center mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <AIHostAvatar message={aiMessage} isThinking={aiThinking} />
-            </motion.div>
+            {/* Removed QuizBot avatar, replaced by quiz card above */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestionIndex}
@@ -223,7 +224,7 @@ function QuizPartyHomePage() {
           </div>
           <div className="lg:col-span-1 h-[600px]">
             <ChatBox 
-              messages={realComments.length > 0 ? realComments : messages}
+              messages={realComments}
               onSendMessage={handleSendMessage}
               currentQuestion={currentQuestion.text}
             />
