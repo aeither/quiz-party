@@ -15,27 +15,6 @@ export default defineConfig({
     server: {
       allowedHosts: ["basically-enough-clam.ngrok-free.app"],
     },
-    build: {
-      rollupOptions: {
-        // Externalize deps that shouldn't be bundled
-        external: [/^node:.*/, 'fsevents'],
-        output: {
-          // Ensure ESM output
-          format: 'es',
-          // Place dynamic imports in a predictable directory
-          chunkFileNames: 'chunks/[name]-[hash].js',
-        },
-      },
-      // Ensure proper ESM handling
-      target: 'esnext',
-      modulePreload: {
-        polyfill: false,
-      },
-    },
-    optimizeDeps: {
-      // Force include problematic ESM packages
-      include: ['viem', '@tanstack/react-router', '@trpc/client'],
-    },
   },
 });
 
