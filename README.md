@@ -1,3 +1,6 @@
+
+![everquiz](https://github.com/user-attachments/assets/b9c686d9-94ad-4b2d-a14f-a2077e5818cd)
+
 # EverQuiz
 
 **EverQuiz** is the next-generation social quiz and party game platform, built natively on the **Lens Chain mainnet**. It fuses the power of web3, real social data, and dynamic media to create an experience that is fast, free, and truly social.
