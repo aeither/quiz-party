@@ -17,3 +17,6 @@ export default defineConfig({
     },
   },
 });
+
+// NOTE: Netlify serverless functions have a file descriptor limit. If you see EMFILE errors, ensure your bundle is small and avoid dynamic imports in serverless code.
+// If needed, use a netlify.toml with [functions] included_files/excluded_files to control what gets deployed.

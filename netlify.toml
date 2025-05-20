@@ -1,0 +1,31 @@
+[build]
+  command = "pnpm build"
+  publish = "dist"
+  functions = ".netlify/functions-internal"
+
+[functions]
+  # Include only necessary files
+  included_files = [
+    "app/**/*.{ts,tsx,js,jsx}",
+    "node_modules/viem/**/*",
+    "node_modules/@tanstack/**/*",
+    "node_modules/@trpc/**/*"
+  ]
+  # Exclude unnecessary files to reduce bundle size
+  excluded_files = [
+    "**/*.{spec,test}.{ts,tsx,js,jsx}",
+    "**/*.map",
+    "node_modules/.pnpm/**",
+    "node_modules/.cache/**",
+    "**/*.md",
+    "**/*.d.ts"
+  ]
+  # Set node bundler for better tree-shaking
+  node_bundler = "esbuild"
+
+[dev]
+  framework = "#custom"
+  command = "pnpm dev"
+  targetPort = 3000
+  port = 8888
+  publish = "dist" 
