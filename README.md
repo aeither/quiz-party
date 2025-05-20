@@ -7,7 +7,7 @@
 
 ## Demo
 
-https://everquiz-lens.netlify.app/
+https://everquiz.vercel.app/
 
 ---
 
