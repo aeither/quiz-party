@@ -1,12 +1,16 @@
+import { useTRPC } from '@/trpc/react';
+import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { toast } from "sonner";
+import { useAccount } from 'wagmi';
 import ChatBox from '../components/ChatBox';
 import LeaderboardCard from '../components/LeaderboardCard';
+import { PaymentButton } from '../components/PaymentButton';
 import QuestionCard from '../components/QuestionCard';
 import QuizHeader from '../components/QuizHeader';
-import { mockQuestions, mockTournament } from '../data/mockData';
+import { mockTournament } from '../data/mockData';
 import { fetchPostAndComments } from '../lib/lensApi';
 import { Message, Player, Question } from '../types/quiz';
 
@@ -16,20 +20,53 @@ export const Route = createFileRoute('/quiz/$postId')({
 
 function QuizPartyHomePage() {
   const { postId } = useParams({ from: '/quiz/$postId' });
+  const { address } = useAccount();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [questions, setQuestions] = useState<Question[]>(mockQuestions);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [players, setPlayers] = useState<Player[]>(mockTournament.players);
   const [messages, setMessages] = useState<Message[]>(mockTournament.messages);
   const [tournament, setTournament] = useState(mockTournament);
   const [aiThinking, setAiThinking] = useState(false);
   const [aiMessage, setAiMessage] = useState("Welcome to the Knowledge Tournament!");
   const [username, setUsername] = useState("Guest" + Math.floor(Math.random() * 1000));
-
+  const trpc = useTRPC();
+  
   // Real post/comments state
   const [realPost, setRealPost] = useState<any | null>(null);
   const [realComments, setRealComments] = useState<Message[]>([]);
   const [loadingReal, setLoadingReal] = useState(true);
   const [realError, setRealError] = useState<string | null>(null);
+
+  // Quiz generation state
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+
+  // Use React Query's useMutation with trpc mutationOptions
+  const generateQuizMutation = useMutation(
+    trpc.ai.generateQuizFromPost.mutationOptions({
+      onSuccess: (result) => {
+        // Transform the AI-generated questions into our Question format
+        const formattedQuestions = result.questions.map((q: { question: string; options: string[]; answer: string; explanation: string }, index: number) => ({
+          id: `q-${index}`,
+          text: q.question,
+          options: q.options,
+          correctAnswer: q.answer,
+          explanation: q.explanation,
+          timeLimit: 45,
+          difficulty: 'medium' as const,
+          category: '', // required by Question type
+        }));
+        setQuestions(formattedQuestions);
+        toast.success('Quiz generated successfully!');
+      },
+      onError: (error) => {
+        console.error('Failed to generate quiz:', error);
+        toast.error('Failed to generate quiz. Please try again.');
+      },
+      onSettled: () => {
+        setIsGeneratingQuiz(false);
+      }
+    })
+  );
 
   useEffect(() => {
     // Fetch real post and comments
@@ -54,8 +91,20 @@ function QuizPartyHomePage() {
       });
   }, [postId]);
 
+  // Handle payment confirmation and generate quiz
+  const handlePaymentConfirmed = async (txHash: string) => {
+    if (!address || !postId) return;
+    setIsGeneratingQuiz(true);
+    generateQuizMutation.mutate({
+      postId,
+      userAddress: address,
+    });
+  };
+
   useEffect(() => {
     // Simulate a timer for question advancement
+    if (questions.length === 0) return; // Don't start timer if no questions
+    
     const timer = setTimeout(() => {
       if (currentQuestionIndex < questions.length - 1) {
         setAiThinking(true);
@@ -110,7 +159,7 @@ function QuizPartyHomePage() {
         setPlayers(prev => [...prev, newPlayer]);
       }
       // Show toast for points earned
-      toast(`Correct Answer!, You earned ${pointsEarned} points`);
+      toast(`Correct Answer! You earned ${pointsEarned} points`);
       // Add AI response
       setTimeout(() => {
         const aiResponse: Message = {
@@ -147,19 +196,21 @@ function QuizPartyHomePage() {
     };
     setMessages(prev => [...prev, newMessage]);
     // Check if the message is a correct answer to the current question
-    const currentQuestion = questions[currentQuestionIndex];
-    const isCorrect = currentQuestion.correctAnswer.toLowerCase() === message.toLowerCase();
-    if (isCorrect) {
-      handleAnswerSubmit(message, true);
+    if (questions.length > 0) {
+      const currentQuestion = questions[currentQuestionIndex];
+      const isCorrect = currentQuestion.correctAnswer.toLowerCase() === message.toLowerCase();
+      if (isCorrect) {
+        handleAnswerSubmit(message, true);
+      }
     }
   };
 
   const currentQuestion = questions[currentQuestionIndex];
+  const showPaymentButton = !isGeneratingQuiz && questions.length === 0 && !loadingReal && realPost;
 
   return (
     <div className="min-h-screen quiz-gradient py-8 px-4">
       <div className="max-w-7xl mx-auto">
-
         <QuizHeader 
           currentRound={tournament.currentRound}
           totalRounds={tournament.totalRounds}
@@ -192,43 +243,55 @@ function QuizPartyHomePage() {
                   <span>💬 {realPost.stats?.comments || 0}</span>
                   <span>🔄 {realPost.stats?.reposts || 0}</span>
                 </div>
+                {showPaymentButton && (
+                  <div className="w-full max-w-sm mt-4">
+                    <PaymentButton onPaymentConfirmed={handlePaymentConfirmed} />
+                  </div>
+                )}
+                {isGeneratingQuiz && (
+                  <div className="mt-4 text-white font-medium animate-pulse">
+                    Generating quiz questions...
+                  </div>
+                )}
               </>
             )}
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Removed QuizBot avatar, replaced by quiz card above */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentQuestionIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
-                <QuestionCard
-                  question={currentQuestion.text}
-                  options={currentQuestion.options}
-                  correctAnswer={currentQuestion.correctAnswer}
-                  onAnswer={handleAnswerSubmit}
-                  timeLimit={currentQuestion.timeLimit}
-                />
-              </motion.div>
-            </AnimatePresence>
-            <div className="mt-6">
-              <LeaderboardCard players={players} />
+        {questions.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuestionIndex}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <QuestionCard
+                    question={currentQuestion.text}
+                    options={currentQuestion.options}
+                    correctAnswer={currentQuestion.correctAnswer}
+                    onAnswer={handleAnswerSubmit}
+                    timeLimit={currentQuestion.timeLimit}
+                  />
+                </motion.div>
+              </AnimatePresence>
+              <div className="mt-6">
+                <LeaderboardCard players={players} />
+              </div>
+            </div>
+            <div className="lg:col-span-1 h-[600px]">
+              <ChatBox 
+                messages={realComments}
+                onSendMessage={handleSendMessage}
+                currentQuestion={currentQuestion?.text}
+              />
             </div>
           </div>
-          <div className="lg:col-span-1 h-[600px]">
-            <ChatBox 
-              messages={realComments}
-              onSendMessage={handleSendMessage}
-              currentQuestion={currentQuestion.text}
-            />
-          </div>
-        </div>
+        )}
+        
         <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           <p>Connect your wallet to receive on-chain rewards for your participation!</p>
         </div>

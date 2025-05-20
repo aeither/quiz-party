@@ -132,4 +132,56 @@ export const aiRouter = createTRPCRouter({
         });
       }
     }),
+
+  generateQuizFromPost: publicProcedure
+    .input(z.object({
+      postId: z.string(),
+      userAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid Ethereum address"),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // 1. (Mock) Verify payment (in production, check blockchain for tx to 0x5052936D3c98d2d045da4995d37B0DaE80C6F07f)
+      // For now, always allow
+      // 2. Fetch post image/content (mock: you may want to call your own fetchPostAndComments or Lens API)
+      let post: any = null;
+      try {
+        // Try to use your own util if available
+        const { fetchPostAndComments } = await import('../../lib/lensApi');
+        const result = await fetchPostAndComments(input.postId);
+        post = result.post;
+      } catch (e) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Could not fetch post' });
+      }
+      if (!post || !post.image) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Post does not have an image' });
+      }
+      // 3. Use AI to analyze image and generate quiz
+      // For demo, just use the image URL and post content as context
+      const imageUrl = post.image;
+      const postContent = post.content || '';
+      // Compose prompt
+      const prompt = `Analyze the following image and content. If the image contains a question, provide the answer. Otherwise, generate a concise description. Then, create 4 multiple choice quiz questions (A-D) based on the image and content.\n\nImage URL: ${imageUrl}\nContent: ${postContent}`;
+      // Call AI model
+      const { object: quizResult } = await generateObject({
+        model: groq("llama-3.3-70b-versatile"),
+        schema: z.object({
+          questions: z.array(z.object({
+            question: z.string(),
+            options: z.array(z.string()).length(4),
+            answer: z.enum(["A", "B", "C", "D"]),
+            explanation: z.string(),
+          }))
+        }),
+        messages: [
+          {
+            role: "system",
+            content: "You are a teacher. Your job is to take an image and content, and create a multiple choice test (with 4 questions) based on the content. Each option should be roughly equal in length. For each question, also include a brief explanation of why the correct answer is correct.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      });
+      return quizResult;
+    }),
 });
