@@ -1,106 +1,84 @@
 # EverQuiz
 
-**One-liner:** EverQuiz is your social quiz and party game platform.
+**EverQuiz** is the next-generation social quiz and party game platform, built natively on the **Lens Chain mainnet**. It fuses the power of web3, real social data, and dynamic media to create an experience that is fast, free, and truly social.
 
-**Brief description:** EverQuiz lets you create, join, and play quizzes and party games with friends, powered by web3. (Update the rest of the description as needed to match your new project vision.)
+---
 
-## Overview
+## 🚀 Why EverQuiz Stands Out
 
-Managing digital money for your family can feel complicated. OpenRemit changes that by introducing a friendly AI assistant that understands your everyday language. Want to send allowance to your daughter, Sarah, or pay for your son Alex's online course? Just tell OpenRemit, for example, "send 10 MNT to Sarah."
+- **Smart Contract Powered:** All quiz payments are handled by a custom, immutable smart contract deployed on Lens Chain mainnet, ensuring trustless, transparent, and on-chain participation.
+- **Lens Social Primitives:** EverQuiz taps directly into Lens Protocol's social graph — fetching real posts, comments, likes, and retweets. Every quiz is rooted in authentic, on-chain social content, making each game unique and community-driven.
+- **Bonsai Smart Media Protocol:** Quizzes aren't static — they evolve! EverQuiz leverages Bonsai's Smart Media Protocol to deliver ever-evolving, interactive media as quiz content, keeping the experience fresh and engaging.
+- **Seamless Onboarding:** With ConnectKit and "Continue with Family," users can join in seconds. No gas, no friction — just connect and play. Family onboarding means everyone can join, from crypto-natives to first-timers.
+- **Real-Time, Social, and Fun:** Play with friends, challenge the community, and see your progress on live leaderboards. Every answer, like, and comment is part of the Lens social fabric.
 
-Here's how OpenRemit makes your life easier:
+---
 
-*   **Simple Wallet Connection:** Securely link your digital wallet in a few clicks.
-*   **AI Chat & Voice Assistant:** Our smart assistant (powered by Thirdweb Nebula AI) is ready for your typed or voice commands. No more confusing addresses!
-*   **Clear Balance View:** Always know how much digital money you have available.
-*   **Quick Family Transfers:** Easily send funds to your saved family contacts.
-*   **Transaction History:** Keep track of all your family payments in one place.
-*   *(Coming Soon) Recurring Payments:* Set up regular allowances or payments effortlessly.
-*   *(Coming Soon) Smart Suggestions:* Get helpful reminders for upcoming family expenses.
-*   *(Coming Soon) Easy On/Off Ramps:* Seamlessly move money between your bank and digital wallet.
+## 🌟 Key Features
 
-Behind the scenes, OpenRemit securely manages a contact list where you can save family members' details. When you ask the AI to send money to "Dad," it intelligently finds Dad's saved digital address, making the process safe and error-free.
+- **On-Chain Quiz Payments:** Secure, one-click payments via the EverQuiz smart contract on Lens Chain mainnet. No custodians, no middlemen.
+- **Social-Driven Quizzes:** Quizzes are generated from real Lens posts, with metadata, comments, likes, and retweets woven into the gameplay.
+- **Dynamic Media:** Bonsai Smart Media Protocol powers quizzes with living, evolving media — from images to interactive content.
+- **Instant Wallet Onboarding:** ConnectKit + "Continue with Family" makes onboarding effortless for everyone.
+- **Live Social Interactions:** See and interact with real Lens comments, likes, and reposts as part of the quiz experience.
+- **AI-Powered Quiz Generation:** Advanced AI analyzes Lens posts and media to generate creative, challenging quiz questions in real time.
+- **Leaderboard & Rewards:** Compete for the top spot and earn on-chain rewards for participation and performance.
 
-## Problem It Solves
+---
 
-For parents, managing digital money—whether it's for allowances, gifts, or helping family members—can bring new worries and complexities:
+## 🛠️ Tech Stack
 
-1.  **Fear of Mistakes:** Those long, cryptic digital addresses are confusing! It's easy to worry about sending money to the wrong place. OpenRemit's AI and contact list drastically reduce this risk. You can use familiar names like "Mom" or "Alex," and our AI helps ensure it goes to the right person.
-2.  **Complexity of Web3:** The world of digital currencies can seem like it's only for tech experts. OpenRemit provides an easy-to-use interface that feels as natural as sending a text message, making digital finance accessible to everyone in the family.
-3.  **Time-Consuming Processes:** Traditional international remittances can be slow and costly. While OpenRemit starts with on-chain crypto, its AI-driven approach simplifies the steps involved in any digital transfer.
-4.  **Teaching Financial Responsibility:** As kids grow, teaching them about digital money is important. OpenRemit's clear interface and transaction history can be a helpful tool for families navigating digital finance together.
-5.  **Bridging Digital and Traditional Money:** (Looking ahead) Moving money between your bank account and digital wallet shouldn't be a chore. OpenRemit aims to make this seamless.
+- **Frontend:**
+  - React, TypeScript, TanStack Router & Query, Tailwind CSS, Shadcn/UI, Vite
+- **Web3 & Onboarding:**
+  - ConnectKit, Lens Chain mainnet, custom QuizPayment smart contract
+- **Social Data:**
+  - Lens Protocol APIs for posts, comments, likes, retweets
+- **Media:**
+  - Bonsai Smart Media Protocol for dynamic quiz content
+- **Backend:**
+  - tRPC, Drizzle ORM, PostgreSQL
+- **AI:**
+  - Vercel AI SDK, Groq LLMs for quiz generation and social data analysis
 
-## Tech Stack
+---
 
-*   **Frontend:**
-    *   React
-    *   TypeScript
-    *   TanStack Router (for routing)
-    *   TanStack Query (for server state management)
-    *   Tailwind CSS (for styling)
-    *   Shadcn/UI (for UI components)
-    *   Vite (build tool, via TanStack Start template)
-*   **Web3 Integration:**
-    *   Thirdweb SDK (Wallet Connection, Nebula AI client-side integration, smart contracts interaction)
-*   **Backend (API Layer):**
-    *   tRPC
-*   **Database:**
-    *   PostgreSQL (assumed, based on Drizzle `pgTable` usage)
-    *   Drizzle ORM (for database access and schema management)
-*   **AI & NLP:**
-    *   Vercel AI SDK
-    *   Groq (as the LLM provider for intent parsing and other AI tasks)
-    *   Thirdweb Nebula AI (for core transaction understanding and execution proposal)
-    *   Speech-to-Text and Text-to-Speech APIs (for voice command support)
-*   **Package Manager:** pnpm
+## 🧠 How It Works
 
-## Architecture
+1. **Connect & Onboard:** Users join instantly with ConnectKit and "Continue with Family" — no crypto experience required.
+2. **Select a Quiz:** Quizzes are sourced from real Lens posts, with all social context (comments, likes, etc.) included.
+3. **Pay & Play:** Users pay the quiz entry fee directly to the EverQuiz smart contract on Lens Chain mainnet. Payment is enforced and tracked on-chain.
+4. **Dynamic Gameplay:** Each quiz is powered by Bonsai Smart Media and AI-generated questions, making every session unique.
+5. **Social Interaction:** Players see and interact with real Lens comments and reactions as part of the quiz.
+6. **Compete & Earn:** Top players are rewarded on-chain, and everyone can see their progress on live leaderboards.
 
-OpenRemit follows a modern full-stack TypeScript architecture:
+---
 
-1.  **Client (Browser - `app/` directory):**
-    *   The UI is built with React, TypeScript, and Shadcn/UI components, focusing on ease of use.
-    *   TanStack Router handles client-side navigation and route definitions (`app/routes/`).
-    *   The `NebulaIntegration.tsx` component interfaces directly with Thirdweb's `Nebula.chat()` SDK for AI-driven transaction flows, after an initial intent parsing step.
-    *   Wallet connectivity is managed by Thirdweb's React hooks.
-    *   Client-side state and API calls to the tRPC backend are managed using TanStack Query and a tRPC client.
-    *   Voice command processing and synthesis for hands-free operation.
+## ✨ What Makes EverQuiz Special?
 
-2.  **API Layer (`app/trpc/` directory):**
-    *   tRPC is used to create a type-safe API between the frontend and backend logic.
-    *   `userRouter.ts`: Manages user creation/updates and CRUD operations for user-specific contacts (e.g., family member name-to-address mappings).
-    *   `aiRouter.ts`: Contains procedures for advanced AI processing. For example, `parseUserIntentForNebula` takes raw user chat input or voice commands, uses an LLM (via Vercel AI SDK and Groq) to understand the intent and extract entities. If a contact name is mentioned (e.g., "send to Dad"), it calls the `userRouter` to resolve "Dad" to a blockchain address before the information is passed to the client-side Nebula AI.
+- **Creativity:** Fuses social, AI, and dynamic media for a never-before-seen quiz experience.
+- **Technical Skill:** Deep integration with Lens Chain, custom smart contracts, real-time AI, and evolving media.
+- **Usefulness:** Makes learning, socializing, and earning fun and accessible for everyone — from families to crypto pros.
+- **UX & Design:** Playful, modern, and intuitive. Onboarding is instant, gameplay is social, and rewards are real.
+- **Presentation:** Every detail is crafted to wow — from seamless onboarding to live, on-chain social interaction.
 
-3.  **Database (`app/db/` directory):**
-    *   Drizzle ORM is used to define the schema (`schema.ts`) and interact with the PostgreSQL database.
-    *   Key tables include `users` (stores user addresses and IDs) and `contacts` (stores user-specific name-address mappings).
+---
 
-4.  **External Services:**
-    *   **Thirdweb:** Provides client IDs, wallet connection UI, and the Nebula AI service for understanding and preparing blockchain transactions from natural language.
-    *   **Groq:** Serves as the LLM provider for the `aiRouter` to perform initial intent parsing and entity extraction before interacting with Nebula or other services.
-    *   **Fiat Gateways:** (Future) Integration with payment processors for onramp and offramp capabilities.
+## 🏁 Getting Started
 
-**Flow Example (Sending money to a family member):**
-
-1.  Mom wants to send some digital pocket money. She opens OpenRemit and tells the AI assistant, "Send Alex 10 MNT for his game."
-2.  The app securely sends this request (and Mom's user identifier) to OpenRemit's `aiRouter`.
-3.  The `aiRouter` (using Groq) understands: Mom wants to send 10 MNT to someone named "Alex".
-4.  The `aiRouter` then asks the `userRouter`: "Who is 'Alex' in Mom's contact list?"
-5.  The `userRouter` checks the database and finds Alex's saved digital address (e.g., `0xXYZ...`).
-6.  The `aiRouter` tells the app: "Okay, you want to send 10 MNT to `0xXYZ...` (Alex)."
-7.  The app now clearly instructs Nebula AI: "Prepare a transaction to send 10 MNT to `0xXYZ...`."
-8.  Nebula AI prepares the transaction details.
-9.  Mom sees a simple confirmation on her screen and approves the payment with a secure click in her connected wallet.
-
-## Getting Started
-
-(To be filled in: Instructions on cloning, .env setup, installing dependencies, running the dev server, database setup, etc.)
-
-## Contributing
-
-(To be filled in: Guidelines for contributors.)
-
-## License
-
-(To be filled in: e.g., MIT License.)
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/aeither/everquiz.git
+   cd everquiz
+   ```
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
+3. **Set up environment:**
+   - Copy `.env.example` to `.env` and fill in required values.
+4. **Run the dev server:**
+   ```bash
+   pnpm dev
+   ```
+5. **Connect your wallet and start playing!**
