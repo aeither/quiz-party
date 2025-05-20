@@ -7,21 +7,36 @@
   # Include only necessary files
   included_files = [
     "app/**/*.{ts,tsx,js,jsx}",
-    "node_modules/viem/**/*",
-    "node_modules/@tanstack/**/*",
-    "node_modules/@trpc/**/*"
+    "dist/**/*",
+    "node_modules/viem/dist/**/*",
+    "node_modules/@tanstack/*/dist/**/*",
+    "node_modules/@trpc/*/dist/**/*"
   ]
-  # Exclude unnecessary files to reduce bundle size
-  excluded_files = [
-    "**/*.{spec,test}.{ts,tsx,js,jsx}",
-    "**/*.map",
-    "node_modules/.pnpm/**",
-    "node_modules/.cache/**",
-    "**/*.md",
-    "**/*.d.ts"
-  ]
-  # Set node bundler for better tree-shaking
   node_bundler = "esbuild"
+  # Increase node version for better ESM support
+  node_version = "20"
+
+  [functions.excluded_files]
+    files = [
+      "**/*.{spec,test}.{ts,tsx,js,jsx}",
+      "**/*.map",
+      "**/*.md",
+      "**/*.d.ts"
+    ]
+    node_modules = [
+      ".pnpm/**",
+      ".cache/**",
+      ".nitro/**"
+    ]
+    external_node_modules = [
+      "fsevents",
+      "@swc/*",
+      "@esbuild/*"
+    ]
+
+[build.environment]
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  NITRO_PRESET = "netlify"
 
 [dev]
   framework = "#custom"
