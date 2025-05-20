@@ -5,6 +5,10 @@
 
 **EverQuiz** is the next-generation social quiz and party game platform, built natively on the **Lens Chain mainnet**. It fuses the power of web3, real social data, and dynamic media to create an experience that is fast, free, and truly social.
 
+## Demo
+
+https://everquiz-lens.netlify.app/
+
 ---
 
 ## 🚀 Why EverQuiz Stands Out
@@ -85,3 +89,7 @@
    pnpm dev
    ```
 5. **Connect your wallet and start playing!**
+
+## Screenshot
+
+![screenshot1](https://github.com/user-attachments/assets/42022b8b-542c-42b0-a0f8-258f3f1dea3d)
